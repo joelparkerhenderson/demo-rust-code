@@ -6,6 +6,6 @@ Demonstration of the Rust programming language basics.
 
   * Uses many examples and explanations from the official Rust documentation.
 
-See the file [demo.rs](demo.rs)
+See the file [src/demo.rs](src/demo.rs)
 
 

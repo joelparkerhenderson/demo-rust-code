@@ -35,6 +35,7 @@ extern crate html5ever; // HTML5 parser
 
 // Import modules
 //
+use std::env; // Use the standard library environment module
 use std::io; // Use the standard library input-output module
 use std::net; // Use the standard library networking module
 use rand::Rng; // Use the rand crate random number generator
@@ -381,6 +382,11 @@ fn demo_convert_a_string_to_a_number() {
 // The `main` function is a special name, 
 // much like in C/C++, because it runs first.
 fn main() {
+
+    // Demo code that gets command line arguments and prints them.
+    let args: Vec<String> = std::env::args().collect();
+    println!("{:?}", args);
+
     demo_println();
     demo_compare();
     demo_shadow();
