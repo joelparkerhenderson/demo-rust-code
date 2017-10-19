@@ -3,6 +3,12 @@
 // This demo is suitable for newcomers to Rust who know
 // other programming langauges such as C, Java, Python, etc.
 
+////
+//
+// Introduction
+//
+////
+
 // Compiler directives
 //
 // The Rust compiler will normally warn about issues such
@@ -90,7 +96,7 @@ use errors::*;
 
 ////
 //
-// Testing
+// Test
 //
 ////
 
@@ -120,13 +126,19 @@ mod tests { // Define a module named "tests"
     }
 }
 
- // Define a public function named "foo" that returns a boolean 
+// Define a public function named `foo`.
+// The function has no arguments.
+// The function returns a boolean. 
+//
 pub fn foo() -> bool {
     true // Return true
 }
 
-// Define a public function named "echo" that takes one argument `s`
-// that is a string fragment type `&str`, and returns the same text.
+// Define a public function named `echo`.
+// The function has one argument `s` of type `&str` string fragment.
+// The function returns one value of type `&str` string fragment.
+// 
+ and returns the same text.
 pub fn echo(s: &str) -> &str {
     s
 }
@@ -137,13 +149,10 @@ pub fn echo(s: &str) -> &str {
 // Note that a macro is not the same as a function.
 //
 fn demo_println() {
-
     // Print to standard output
-    println!("Hello"); 
-    
+    println!("Hello");     
     // String interpolation placeholders
     println!("Hello {} and {}", "Alice", "Bob");
-
 }
 
 // Demo constants
@@ -183,16 +192,16 @@ fn demo_variables() {
 
     // Types
     let c: i32 = 1; // Variable is type signed integer 32 bit
-    let d: f64 = 1.0; // Variable is type floating point 64 bit
+    let d: f64 = 1.1; // Variable is type floating point 64 bit
 
     // Char
     let letter: char = 'x'; // Any Unicode Scalar Value, not just one byte 
 
     // Array
-    let arr = [1, 2, 3]; // Each element must be the same type
+    let arr = [1, 2, 3]; // Each element must be the same type 
 
     // Tuple
-    let tup: (i32, f64, char) = (1, 2.0, 'x'); // Each element can be its own type
+    let tup: (i32, f64, char) = (1, 1.1, 'x'); // Each element can be its own type
 
     // Object with initialization
     let mut f = String::new(); // Create a new empty string
@@ -209,14 +218,14 @@ fn demo_variables() {
 
 fn demo_array_access() {
     let arr = [1, 2, 3];
-    let x = arr[0];
-    let y = arr[1];
-    let z = arr[2];
+    let a = arr[0]; // a=10
+    let b = arr[1]; // b=20
+    let c = arr[2]; // c=30
 }
 
 fn demo_tuple_destructure() {
-    let tup = (1, 2, 3);
-    let (x, y, z) = tup;
+    let tup = (1, 1.1, 'x');
+    let (a, b, c) = tup; // This sets a=1, b=1.1, c='x'
 }
 
 fn demo_control_flow() {
