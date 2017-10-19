@@ -1,0 +1,8 @@
+[package]
+name = "htx-rust"
+version = "0.1.0"
+authors = ["Joel Parker Henderson <joel@joelparkerhenderson.com>"]
+
+[dependencies]
+error-chain = "*"
+getopts = "*"
