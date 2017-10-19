@@ -86,13 +86,15 @@ use std::cmp::Ordering; // Enums for `cmp` compare function
 
 // This code is specificalliy for the `error-chain` crate.
 // It sets up typical error handling types that we use everywhere.
-// Notably, it sets up a `Result` type that we prefer to `std::result`.
-mod errors {
-    // Create the Error, ErrorKind, ResultExt, and Result types
-    error_chain! { }
+//
+// This uses a macro `error_chain!` in the error-chain crate,
+// to create the types Error, ErrorKind, ResultExt, and Result.
+// Notably, the `Result` type is one we prefer to `std::result`.
+//
+mod errors { // Define a module named "tests"
+    error_chain! { } // This is an error-chain macro that creates types.
 }
-
-use errors::*;
+use errors::*; // Use the errors module that we just created above.
 
 ////
 //
