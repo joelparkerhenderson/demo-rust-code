@@ -139,8 +139,7 @@ pub fn foo() -> bool {
 // Define a public function named `echo`.
 // The function has one argument `s` of type `&str` string fragment.
 // The function returns one value of type `&str` string fragment.
-// 
- and returns the same text.
+// and returns the same text.
 pub fn echo(s: &str) -> &str {
     s
 }
