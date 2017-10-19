@@ -16,6 +16,9 @@
 //
 #![allow(unused)] // Allow all unused issues, such as dead code.
 
+// `error_chain!` can recurse deeply, sp we limit it.
+#![recursion_limit = "1024"]
+
 // External crates
 //
 // Link an external crate library, and import all its 
@@ -30,8 +33,9 @@
 // The project we're been building is a binary crate, 
 // which is an executable, to be run on the command line.
 //
+#[macro_use] extern crate error_chain; // error handling everywhere
+extern crate getopts; // command line option parser
 extern crate rand; // randomization functions
-extern crate html5ever; // HTML5 parser
 
 // Import modules
 //
@@ -47,7 +51,7 @@ use rand::Rng; // Use the rand crate random number generator
 //
 // Enumerations are often referred to as enums. 
 //
-// The `Result` enum and its variants:
+// The `std::result Result` enum and its variants:
 //
 //   * The `Ok` variant indicates the operation succeeded, 
 //     and the variant contains the successful value.
@@ -55,7 +59,9 @@ use rand::Rng; // Use the rand crate random number generator
 //   * The `Err` variant indicates the operation failed, 
 //     and the variant contains information about the failure.
 //
-// The `Ordering` enum and its variants:
+//   * We prefer to use the `error-chain` crate for Result.
+//
+// The `std::cmp::Ordering` enum and its variants:
 //
 //   * `Less`
 //
@@ -66,8 +72,28 @@ use rand::Rng; // Use the rand crate random number generator
 use std::result; // Enums for error handling
 use std::cmp::Ordering; // Enums for `cmp` compare function
 
+////
+//
+// Errors
+//
+////
+
+// This code is specificalliy for the `error-chain` crate.
+// It sets up typical error handling types that we use everywhere.
+// Notably, it sets up a `Result` type that we prefer to `std::result`.
+mod errors {
+    // Create the Error, ErrorKind, ResultExt, and Result types
+    error_chain! { }
+}
+
+use errors::*;
+
+////
+//
 // Testing
-// 
+//
+////
+
 // Rust and Cargo have good testing capabilities,
 // by defining test functions in their own module.
 //
@@ -120,14 +146,34 @@ fn demo_println() {
 
 }
 
+// Demo constants
+//
+// A constant name uses the convention of all uppercase.
+//
+// Constants can be declared in any scope including global. 
+//
+// Constants require explicit type annotation.
+//
+// Rust has two different types of constants. 
+//
+//   * `const`: An immutable value; this is the common case.
+//   * `static`: A possibly-mutable variable with `'static `lifetime.
+//
+fn demo_constants() {
+
+    // Immutable
+    const FOO: i32 = 1;
+
+    // Static lifetime
+    static GOO: &'static str = "Hello World";
+
+}
+
 // Demo variables
 //
 // This shows examples of variables and a constant.
 //
 fn demo_variables() {
-
-    // Constant
-    const a = 1; // A constant is always immutable
 
     // Variable
     let b = 1; // A variable is immutable by default
@@ -137,16 +183,16 @@ fn demo_variables() {
 
     // Types
     let c: i32 = 1; // Variable is type signed integer 32 bit
-    let d: f64 = 1; // Variable is type floating point 64 bit
+    let d: f64 = 1.0; // Variable is type floating point 64 bit
 
     // Char
     let letter: char = 'x'; // Any Unicode Scalar Value, not just one byte 
 
     // Array
-    let arr: i32 = [1, 2, 3]; // Each element must be the same type
+    let arr = [1, 2, 3]; // Each element must be the same type
 
     // Tuple
-    let tup: (i32, f64, char) = (1, 2, 'x'); // Each element can be its own type
+    let tup: (i32, f64, char) = (1, 2.0, 'x'); // Each element can be its own type
 
     // Object with initialization
     let mut f = String::new(); // Create a new empty string
@@ -163,9 +209,9 @@ fn demo_variables() {
 
 fn demo_array_access() {
     let arr = [1, 2, 3];
-    let x = a[0];
-    let y = a[1];
-    let z = a[2];
+    let x = arr[0];
+    let y = arr[1];
+    let z = arr[2];
 }
 
 fn demo_tuple_destructure() {
@@ -174,23 +220,25 @@ fn demo_tuple_destructure() {
 }
 
 fn demo_control_flow() {
-    let x = true;
+    let a = true;
+    let b = true;
+    let c = true;
 
-    if x {
+    if a {
         //...
     }
 
-    if x {
+    if a {
         //...
     } else {
         //...
     }
 
-    if x {
+    if a {
         //...
-    } else if y {
+    } else if b {
         //...
-    } else if z {
+    } else if c {
         //...
     } else {
         //...
@@ -201,12 +249,13 @@ fn demo_control_flow() {
         break;
     }
 
-    while b {
+    while a {
         //...
+        break;
     }
 
     let arr = [1, 2, 3];
-    for a in arr.iter() {
+    for item in arr.iter() {
         //...
     }
 
@@ -246,7 +295,7 @@ fn demo_compare() {
 // This feature is often used when coverting a value to a similar value,
 // such as converting a value from one type to another type. 
 //
-fn demo_shadow_variable() {
+fn demo_shadow() {
     let x = "    hello     "; // a string with some whitespace padding
     println!("x is {} before trimming", x);
     let x = x.trim();
@@ -320,12 +369,12 @@ fn demo_string_append() {
 //
 fn demo_result_with_error_handling() {
     // Create some text
-    let x = "123"
+    let x = "123";
     // Try to parse the text into an unsigned integer number,
     // then try to match the Result to either Ok or Err.
     let x: u32 = match x.parse() { 
-        Ok(num) => println!("parse num is {}", num);
-        Err(_) => println!("parse failed");
+        Ok(num) => num,
+        Err(_) => 0
     }; // Note semicolon which ends the statement
 }
 
@@ -379,14 +428,131 @@ fn demo_convert_a_string_to_a_number() {
     .expect("must be a number"); // if there's an error, then crash
 }
 
+// Demo file name to string.
+//
+// This includes a utf8-encoded file as a string, 
+// i.e. this looks for a file named "text.txt",
+// then opens the file and returns the file's text.
+// 
+// The file is located relative to the current file,
+// similarly to how modules are found.
+//
+// This macro will yield an expression of type `&'static str` 
+// which is the contents of the file.
+//
+fn demo_file_name_to_string() {
+    let s = include_str!("text.txt");
+}
+
+use std::io::Read;
+fn demo_file_path_to_string() -> String {
+    let name = "text.txt";
+    let path = std::path::Path::new(name);
+    let mut file = std::fs::File::open(path)
+    .expect("file open failed");
+    let mut s = String::new();
+    file.read_to_string(&mut s)
+    .expect("file read failed");
+    s
+}
+
+////
+//
+// main
+//
+////
+
 // The `main` function is a special name, 
 // much like in C/C++, because it runs first.
+//
+// It's fine if you write typical code in the main function.
+// We suggest this workflow: start with error handling code, 
+// then get any command line options, then run typical code. 
+// 
+// We like to use these steps for clarity:
+//
+//   * `main` doesn't do anything except call the next function;
+//     we do it this way to make the workflow easier to follow.
+//
+//   * `main_error_chain` sets up the `error-chain` crate info;
+//     we use the error-chain documentation code boilerplate.
+//
+//   * `main_getopts` sets up the `getopts` crate info;
+//     we set up all the command-line options, such as flags.
+//
+//   * `main_help` prints some help text and usage information;
+//     much of this is automatic thanks to the `getopts` crate.
+//
+//   * `main_version` prints the version number;
+//     we like to use semantic versioning, such as "x.y.z".
+//
+//   * `main_run` is where your typical code goes and does work.
+//
 fn main() {
+    main_error_chain();
+}
 
-    // Demo code that gets command line arguments and prints them.
+// We wrap everything in error handling code,
+// which is provided by the crate `error-chain`.
+//
+// This code is from the error-chain documentation,
+// and provides a simple way to print all errors.
+// All our typical programs use this exact code.
+//
+#[allow(dead_code)]
+fn main_error_chain() {
+    if let Err(ref e) = main_getopts() {
+        use std::io::Write;
+        use error_chain::ChainedError; 
+        let stderr = &mut ::std::io::stderr();
+        let errmsg = "Error writing to stderr";
+        writeln!(stderr, "{}", e.display_chain()).expect(errmsg);
+        ::std::process::exit(1);
+    }
+}
+
+// Get the command line options.
+// Customize this for your program's options.
+//
+// Return `Result<()>` which is an `error-chain` standard
+// that means any result or any error-chain compatible error.
+//
+fn main_getopts() -> Result<()> {
+
+    // Get all the args into a vector, for easier processing.
+    // Note that std::env::args will panic if any argument contains
+    // invalid Unicode; see the Rust docs for how to handle this.
     let args: Vec<String> = std::env::args().collect();
-    println!("{:?}", args);
+    
+    // Unix convention puts the program name in the first argument.
+    // However, this is not secure nor reliable, so use at your own risk.
+    let program = args[0].clone(); 
 
+    // Create the options parser, then add option flags and option values.
+    let mut opts = getopts::Options::new();
+    opts.optflag("h", "help", "print the help information");
+    opts.optflag("v", "version", "print the version number");
+
+    // Parse the args
+    let matches = match opts.parse(&args[1..]) {
+        Ok(m) => { m }
+        Err(f) => { panic!(f.to_string()) }
+    };
+
+    if matches.opt_present("h") {
+        main_help(&program, opts);
+        return Ok(());
+    }
+
+    if matches.opt_present("v") {
+        main_version();
+        return Ok(());
+    }
+
+    main_run(&program, opts)
+}
+
+fn main_run(program: &str, opts: getopts::Options) -> Result<()> {
     demo_println();
     demo_compare();
     demo_shadow();
@@ -399,4 +565,14 @@ fn main() {
     demo_input();
     demo_output();
     demo_convert_a_string_to_a_number();
+    Ok(())
+}
+
+fn main_help(program: &str, opts: getopts::Options) {
+    let brief = format!("Help: {} [options]", program);
+    print!("{}", opts.usage(&brief));
+}
+
+fn main_version() {
+    println!("x.y.z");
 }
